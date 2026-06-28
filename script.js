@@ -1,5 +1,5 @@
 // ==========================================
-// Dambar - Neural Network + Paragraph Engine
+// Dambar - Neural Network + Paragraph Engine + Math
 // ==========================================
 
 const memory = [];
@@ -17,6 +17,82 @@ let modelTrained = false;
 let wordPairs = {};
 let starters = [];
 const PARAGRAPHS = [];
+
+// ============ MATH ENGINE ============
+
+function solveMath(input) {
+    const text = input.toLowerCase().replace(/\s+/g, ' ').trim();
+    
+    const patterns = [
+        /(?:what is |calculate |solve |compute |evaluate |math )?(-?\d+\.?\d*)\s*([+\-*\/^])\s*(-?\d+\.?\d*)/,
+        /(?:what is |calculate |solve |compute |evaluate |math )?(-?\d+\.?\d*)\s*(plus|minus|times|divided by|multiplied by|power)\s*(-?\d+\.?\d*)/,
+    ];
+    
+    for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) {
+            let num1 = parseFloat(match[1]);
+            let operator = match[2];
+            let num2 = parseFloat(match[3]);
+            
+            const wordOps = {
+                'plus': '+', 'minus': '-', 'times': '*',
+                'multiplied by': '*', 'divided by': '/', 'power': '^'
+            };
+            
+            if (wordOps[operator]) operator = wordOps[operator];
+            
+            let result;
+            switch (operator) {
+                case '+': result = num1 + num2; break;
+                case '-': result = num1 - num2; break;
+                case '*': result = num1 * num2; break;
+                case '/':
+                    if (num2 === 0) return "Division by zero is undefined.";
+                    result = num1 / num2;
+                    break;
+                case '^': result = Math.pow(num1, num2); break;
+                default: return null;
+            }
+            
+            const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+            const symbol = { '+': '+', '-': '-', '*': 'x', '/': '/', '^': '^' }[operator];
+            return `${num1} ${symbol} ${num2} = ${formatted}`;
+        }
+    }
+    
+    // Square root
+    const sqrtMatch = text.match(/(?:square root of |sqrt of |sqrt )(-?\d+\.?\d*)/);
+    if (sqrtMatch) {
+        const num = parseFloat(sqrtMatch[1]);
+        if (num < 0) return "Square root of a negative number is not a real number.";
+        const result = Math.sqrt(num);
+        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+        return `sqrt(${num}) = ${formatted}`;
+    }
+    
+    // Percentage
+    const pctMatch = text.match(/(?:what is |calculate )?(-?\d+\.?\d*)\s*(?:%|percent)\s*of\s*(-?\d+\.?\d*)/);
+    if (pctMatch) {
+        const pct = parseFloat(pctMatch[1]);
+        const num = parseFloat(pctMatch[2]);
+        const result = (pct / 100) * num;
+        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(2));
+        return `${pct}% of ${num} = ${formatted}`;
+    }
+    
+    // Power
+    const powMatch = text.match(/(-?\d+\.?\d*)\s*(?:\^|to the power of|power)\s*(-?\d+\.?\d*)/);
+    if (powMatch) {
+        const base = parseFloat(powMatch[1]);
+        const exp = parseFloat(powMatch[2]);
+        const result = Math.pow(base, exp);
+        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+        return `${base}^${exp} = ${formatted}`;
+    }
+    
+    return null;
+}
 
 // ============ PARAGRAPH LEARNING ============
 
@@ -271,6 +347,10 @@ function findMatch(input) {
 // ============ RESPONSE ============
 
 async function getResponse(input) {
+    // 0. MATH - Calculate first
+    const mathResult = solveMath(input);
+    if (mathResult) return mathResult;
+    
     // 1. Exact match
     const match = findMatch(input);
     if (match) return match;
