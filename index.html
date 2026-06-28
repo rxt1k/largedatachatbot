@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dambar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <div class="chat" id="chatContainer"></div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    class="input-field" 
+                    id="userInput" 
+                    placeholder="Message..."
+                    autofocus
+                >
+                <button class="send-btn" id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEBUG PANEL -->
+    <div class="debug-panel" id="debugPanel">
+        <div class="debug-header">
+            <span>Learned Data (<span id="learnedCount">0</span>)</span>
+            <button class="debug-btn" onclick="clearLearned()">Clear</button>
+            <button class="debug-btn" onclick="document.getElementById('debugPanel').style.display='none'">×</button>
+        </div>
+        <pre class="debug-content" id="debugContent"></pre>
+    </div>
+    
+    <div class="debug-toggle" onclick="document.getElementById('debugPanel').style.display='flex'">📋</div>
+
+    <script src="training-data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
