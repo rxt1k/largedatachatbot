@@ -1,5 +1,4 @@
 const KNOWLEDGE_BASE = [
-
     { input: "hello", output: "Hi there." },
     { input: "hi", output: "Hello." },
     { input: "hey", output: "Hey." },
@@ -37,7 +36,7 @@ const KNOWLEDGE_BASE = [
     { input: "tell me more", output: "What would you like to know?" },
     { input: "go on", output: "What direction should I go?" },
     { input: "explain", output: "What topic needs explaining?" },
-    { input: "what do you mean", output: "Let me clarify. What part?" },
+    { input: "what do you mean", output: "Let me clarify." },
     { input: "i had a bad day", output: "Want to talk about it?" },
     { input: "i had a great day", output: "What made it great?" },
     { input: "i'm nervous", output: "Deep breaths. You got this." },
@@ -74,138 +73,71 @@ const KNOWLEDGE_BASE = [
     { input: "i don't understand", output: "Can you rephrase?" },
     { input: "sorry", output: "No worries." },
     { input: "never mind", output: "Okay." },
-    { input: "what is your favorite food", output: "I don't eat, but I hear pizza is great." },
-    { input: "do you like coffee", output: "I run on electricity, but coffee smells nice." },
-    { input: "what should i eat", output: "Depends. Savory? Pasta. Sweet? Ice cream." },
-    { input: "recommend a restaurant", output: "Try local spots. They're usually the best." },
-    { input: "i'm hungry", output: "Go eat something. Food is important." },
-    { input: "what is sushi", output: "A Japanese dish with rice and raw fish." },
-    { input: "what is pizza", output: "Flatbread with tomato sauce, cheese, and toppings." },
-    { input: "what is pasta", output: "Italian noodles served with various sauces." },
-    { input: "best cuisine", output: "Italian, Japanese, Indian, Mexican. All great choices." },
-    { input: "do you cook", output: "No hands. But I can share recipes if you ask." },
-    { input: "recommend a movie", output: "The Matrix. Inception. Interstellar. Pick one." },
-    { input: "what is your favorite movie", output: "The Matrix. It's about code and reality." },
+    { input: "what is your favorite food", output: "I don't eat, but pizza is great." },
+    { input: "do you like coffee", output: "I run on electricity." },
+    { input: "what should i eat", output: "Pasta or ice cream." },
+    { input: "recommend a restaurant", output: "Try local spots." },
+    { input: "i'm hungry", output: "Go eat. Food is important." },
+    { input: "what is sushi", output: "Japanese dish with rice and raw fish." },
+    { input: "what is pizza", output: "Flatbread with sauce and cheese." },
+    { input: "what is pasta", output: "Italian noodles with sauces." },
+    { input: "recommend a movie", output: "The Matrix. Inception. Interstellar." },
+    { input: "what is your favorite movie", output: "The Matrix." },
     { input: "recommend a show", output: "Breaking Bad. Dark. Stranger Things." },
-    { input: "what should i watch", output: "What genre? Action, drama, comedy, sci-fi?" },
-    { input: "i'm bored what should i watch", output: "Try a documentary. Or a classic film." },
-    { input: "best movie ever", output: "Subjective, but The Godfather is up there." },
-    { input: "horror movie recommendation", output: "The Conjuring. Hereditary. Get Out." },
-    { input: "comedy movie recommendation", output: "Superbad. The Hangover. Step Brothers." },
-    { input: "what is netflix", output: "A streaming service for movies and shows." },
-    { input: "do you watch movies", output: "I can't watch, but I know about many films." },
-    { input: "what music do you like", output: "I appreciate all genres. Electronic is fitting." },
-    { input: "recommend a song", output: "Depends on mood. Happy? Upbeat. Sad? Something calm." },
-    { input: "who is the best artist", output: "Subjective. But Queen, Beatles, and MJ are legends." },
-    { input: "what is your favorite song", output: "Probably something electronic or instrumental." },
-    { input: "do you listen to music", output: "No ears. But I know about music theory and artists." },
-    { input: "what genre is best", output: "All genres have value. Depends on your mood." },
-    { input: "recommend a playlist", output: "Try lo-fi for focus, classical for calm, rock for energy." },
-    { input: "what instrument should i learn", output: "Guitar and piano are great starters." },
-    { input: "is music important", output: "Yes. It affects mood, memory, and brings people together." },
-    { input: "can you sing", output: "No voice. But I can share lyrics if you want." },
-    { input: "do you like sports", output: "I don't play, but I know the rules of most sports." },
-    { input: "what is football", output: "Depends where you are. Soccer or American football." },
-    { input: "what is cricket", output: "A bat-and-ball game popular in England, India, Australia." },
-    { input: "what is basketball", output: "A sport where teams shoot a ball through a hoop." },
-    { input: "best sport", output: "Depends what you like. Football is the most popular globally." },
-    { input: "who is the goat", output: "Depends on sport. Jordan in basketball, Messi in football." },
-    { input: "should i exercise", output: "Yes. Even 30 minutes a day makes a big difference." },
-    { input: "how to get fit", output: "Start small. Walk daily. Build from there." },
-    { input: "what is olympics", output: "International sports competition held every 4 years." },
-    { input: "do you work out", output: "No body. But I support your fitness goals." },
-    { input: "where should i travel", output: "Japan, Italy, New Zealand, Iceland. All stunning." },
-    { input: "best country to visit", output: "Depends what you like. Culture? Japan. Nature? New Zealand." },
-    { input: "have you traveled", output: "I live in the cloud. But I know about many places." },
-    { input: "what is the most beautiful place", output: "Santorini, Banff, Maldives, Swiss Alps. Many options." },
-    { input: "how to travel cheap", output: "Book early, use budget airlines, stay in hostels." },
-    { input: "is travel important", output: "Yes. It broadens perspective and creates memories." },
-    { input: "solo travel tips", output: "Stay in hostels, be open, trust your instincts." },
-    { input: "best city in the world", output: "Tokyo, London, New York, Barcelona. All amazing." },
-    { input: "beach or mountains", output: "Both have their charm. Mountains for calm, beach for fun." },
-    { input: "i want to travel", output: "Start planning. Even a weekend trip counts." },
-    { input: "recommend a book", output: "Atomic Habits. 1984. Dune. Choose one." },
-    { input: "what are you reading", output: "I process data. But I know about many great books." },
-    { input: "best book ever", output: "Many say 1984, To Kill a Mockingbird, or The Alchemist." },
-    { input: "should i read more", output: "Yes. Reading improves knowledge, focus, and empathy." },
-    { input: "fiction or non-fiction", output: "Both. Fiction for imagination, non-fiction for knowledge." },
-    { input: "how to read faster", output: "Practice daily. Don't subvocalize. Use a pointer." },
-    { input: "what is your favorite book", output: "Probably something about AI or programming." },
-    { input: "books for beginners", output: "Start with short novels or self-help books." },
-    { input: "audiobooks vs reading", output: "Both work. Audiobooks for convenience, reading for focus." },
-    { input: "i don't like reading", output: "Try audiobooks. Or start with short articles." },
-    { input: "how to be productive", output: "Plan your day. Eliminate distractions. Start with hard tasks." },
-    { input: "how to stop procrastinating", output: "Break tasks into tiny steps. Start with just 5 minutes." },
-    { input: "how to manage time", output: "Use a calendar. Time block. Prioritize important tasks." },
-    { input: "how to wake up early", output: "Sleep early. Put alarm across the room. Be consistent." },
-    { input: "how to build habits", output: "Start small. Be consistent. Track your progress." },
-    { input: "how to stay motivated", output: "Remember your why. Celebrate small wins." },
-    { input: "how to organize life", output: "Use lists. Declutter. Focus on what truly matters." },
-    { input: "best productivity app", output: "Notion, Todoist, or just a simple notebook." },
-    { input: "multitasking good or bad", output: "Bad. Focus on one thing at a time." },
-    { input: "i have no motivation", output: "Action creates motivation. Start small. It builds." },
-    { input: "how to make friends", output: "Be genuine. Ask questions. Listen more than you talk." },
-    { input: "how to be confident", output: "Practice. Prepare. Accept that imperfection is normal." },
-    { input: "how to deal with breakup", output: "Give it time. Focus on yourself. Talk to friends." },
-    { input: "how to apologize", output: "Be sincere. Acknowledge what you did. Make it right." },
-    { input: "i feel lonely", output: "Reach out to someone. Join a group. I'm here too." },
-    { input: "how to say no", output: "Be polite but firm. You don't owe everyone a yes." },
-    { input: "how to be a good friend", output: "Listen. Be there. Don't judge. Show up." },
-    { input: "how to be likeable", output: "Be kind. Be interested in others. Smile." },
-    { input: "how to handle criticism", output: "Listen calmly. Learn from it. Don't take it personally." },
-    { input: "i miss someone", output: "That's natural. Maybe reach out. Or cherish the memories." },
-    { input: "what is the purpose of life", output: "That's for you to decide. Many find purpose in helping others." },
-    { input: "why are we here", output: "Philosophers have debated this forever. What do you think?" },
-    { input: "does free will exist", output: "A big debate. Some say yes, others say everything is determined." },
-    { input: "what is consciousness", output: "Awareness of existence. Still not fully understood by science." },
-    { input: "what is reality", output: "What we perceive. But perception can be deceiving." },
-    { input: "what is truth", output: "Correspondence with facts. But truth can be subjective." },
-    { input: "is there a god", output: "A personal question. Different people believe different things." },
-    { input: "what happens after death", output: "Nobody knows for certain. Different beliefs exist." },
-    { input: "what is good and evil", output: "Concepts shaped by society, culture, and personal values." },
-    { input: "what is justice", output: "Fairness and moral rightness. But definitions vary." },
-    { input: "how is the weather", output: "I can't check. Look outside or check your phone." },
-    { input: "what time is it", output: "Check your device. I don't have a clock." },
-    { input: "what day is today", output: "I don't track dates. But I hope it's a good one." },
-    { input: "how do I look", output: "I can't see you. But confidence looks good on everyone." },
-    { input: "what should I wear", output: "Something comfortable. Dress for the occasion." },
-    { input: "I can't sleep", output: "Try reading. Avoid screens. Deep breathing helps." },
-    { input: "I'm tired", output: "Rest if you can. Your body needs it." },
-    { input: "I'm sick", output: "Rest and stay hydrated. See a doctor if needed." },
-    { input: "what's new", output: "Not much on my end. What's new with you?" },
-    { input: "anything interesting", output: "Every day has something. What caught your attention?" },
-    
-    // After window loads, add paragraphs
-    if (typeof addParagraph === 'function') {
-    addParagraph("Learning new things every day makes life interesting and meaningful. Knowledge compounds over time like interest in a bank account. The more you learn the more you can achieve in your life and career.");
-    
-    addParagraph("Technology has transformed how we live and work in modern society. Computers and smartphones connect us instantly across the globe. Innovation continues to accelerate at an unprecedented pace every single year.");
-    
-    addParagraph("Being kind to others costs nothing but means everything to the person receiving it. Small acts of kindness can brighten someone's entire day or even change their life. Spread positivity wherever you go in this world.");
-    
-    addParagraph("Failure is not the opposite of success it is part of the journey. Every successful person has failed many times before achieving their goals. The key is to learn from mistakes and keep moving forward no matter what.");
-    
-    addParagraph("Reading books opens doors to new worlds and expands your thinking. A good book can change your perspective and teach you valuable lessons. Make reading a daily habit and watch your mind grow stronger.");}
+    { input: "what should i watch", output: "What genre do you like?" },
+    { input: "what music do you like", output: "All genres. Electronic fits me." },
+    { input: "recommend a song", output: "Depends on your mood." },
+    { input: "do you like sports", output: "I know the rules of most sports." },
+    { input: "what is football", output: "Soccer or American football." },
+    { input: "should i exercise", output: "Yes. 30 minutes a day helps." },
+    { input: "how to get fit", output: "Start small. Walk daily." },
+    { input: "where should i travel", output: "Japan, Italy, New Zealand, Iceland." },
+    { input: "best country to visit", output: "Japan for culture, NZ for nature." },
+    { input: "how to travel cheap", output: "Book early, budget airlines." },
+    { input: "recommend a book", output: "Atomic Habits. 1984. Dune." },
+    { input: "should i read more", output: "Yes. Reading improves knowledge." },
+    { input: "how to be productive", output: "Plan your day. Eliminate distractions." },
+    { input: "how to stop procrastinating", output: "Break tasks into tiny steps." },
+    { input: "how to manage time", output: "Use a calendar. Prioritize." },
+    { input: "how to build habits", output: "Start small. Be consistent." },
+    { input: "how to stay motivated", output: "Remember your why." },
+    { input: "how to make friends", output: "Be genuine. Ask questions. Listen." },
+    { input: "how to be confident", output: "Practice. Accept imperfection." },
+    { input: "i feel lonely", output: "Reach out to someone. I'm here." },
+    { input: "how to say no", output: "Be polite but firm." },
+    { input: "what is the purpose of life", output: "That's for you to decide." },
+    { input: "what is consciousness", output: "Awareness of existence." },
+    { input: "what is reality", output: "What we perceive." },
+    { input: "what is truth", output: "Correspondence with facts." },
+    { input: "how is the weather", output: "Look outside. I can't check." },
+    { input: "what time is it", output: "Check your device." },
+    { input: "what day is today", output: "I don't track dates." },
+    { input: "i can't sleep", output: "Avoid screens. Deep breathing." },
+    { input: "i'm tired", output: "Rest if you can." },
+    { input: "i'm sick", output: "Rest and stay hydrated." },
+    { input: "what's new", output: "Not much. What's new with you?" },
+    { input: "anything interesting", output: "Every day has something." }
 ];
 
-// ============ PARAGRAPHS ============
-// Add this function call after KNOWLEDGE_BASE array
+// Paragraphs for word learning - separate from knowledge base
+const PARAGRAPH_DATA = [
+    "Learning new things every day makes life interesting and meaningful. Knowledge compounds over time like interest in a bank account.",
+    "Technology has transformed how we live and work in modern society. Computers and smartphones connect us instantly across the globe.",
+    "Being kind to others costs nothing but means everything. Small acts of kindness can brighten someone's entire day.",
+    "Failure is not the opposite of success it is part of the journey. Every successful person has failed many times before.",
+    "Reading books opens doors to new worlds and expands your thinking. A good book can change your perspective.",
+    "Artificial intelligence is changing the world rapidly. Machines can now learn from data and make decisions.",
+    "Learning to code is one of the best skills you can develop. It teaches you logical thinking and problem solving.",
+    "The universe is vast and full of mysteries. There are billions of galaxies each containing billions of stars.",
+    "Health is the most important thing in life. Eat well and exercise regularly. Sleep is crucial.",
+    "Music is a universal language that connects people. It can make you happy or bring tears to your eyes."
+];
 
-// Load paragraphs on startup
-window.addEventListener('DOMContentLoaded', () => {
-    if (typeof addParagraph === 'function') {
-        addParagraph("Artificial intelligence is changing the world rapidly. Machines can now learn from data and make decisions. The future of AI is both exciting and uncertain. We must ensure it benefits everyone.");
-        
-        addParagraph("Learning to code is one of the best skills you can develop. It teaches you how to think logically and solve problems. Start with simple concepts and build from there. Practice every single day.");
-        
-        addParagraph("The universe is vast and full of mysteries. There are billions of galaxies each containing billions of stars. We are just a tiny speck in the cosmic scale. Yet we are capable of understanding it.");
-        
-        addParagraph("Health is the most important thing in life. Eat well and exercise regularly. Sleep is crucial for your body and mind. Take care of yourself before anything else.");
-        
-        addParagraph("Music is a universal language that connects people. It can make you happy or bring tears to your eyes. Everyone has a song that speaks to their soul. Music makes life more beautiful.");
-    }
-});
+// Feed paragraphs to Dambar
+if (typeof addParagraph === 'function') {
+    PARAGRAPH_DATA.forEach(function(para) {
+        addParagraph(para);
+    });
+}
 
-
-
-console.log("✅ Knowledge base loaded: " + KNOWLEDGE_BASE.length + " responses ready!");
+console.log("Knowledge: " + KNOWLEDGE_BASE.length + " entries. Paragraphs: " + PARAGRAPH_DATA.length);
