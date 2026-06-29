@@ -1,5 +1,5 @@
 // ==========================================
-// Dambar - Neural Network + Paragraph Engine + Advanced Math
+// Dambar - Neural Network + Paragraph Engine + Math
 // ==========================================
 
 const memory = [];
@@ -18,114 +18,61 @@ let wordPairs = {};
 let starters = [];
 const PARAGRAPHS = [];
 
-// ============ ADVANCED MATH ENGINE ============
+// ============ MATH ENGINE ============
 
 function solveMath(input) {
     const text = input.toLowerCase().replace(/\s+/g, ' ').trim();
     
-    // Check if it's a math question
-    const mathKeywords = ['what is', 'calculate', 'solve', 'compute', 'evaluate', 'math', 
-                          'plus', 'minus', 'times', 'divided by', 'multiplied by', 'power',
-                          'sqrt', 'square root', 'percent', 'factorial', 'abs', 'mod', 'modulo',
-                          'round', 'ceil', 'floor', 'log', 'ln', 'sin', 'cos', 'tan', 'pi',
-                          'integral', 'derivative', 'limit', 'sum', 'product', 'matrix'];
+    const patterns = [
+        /(?:what is |calculate |solve |compute |evaluate |math )?(-?\d+\.?\d*)\s*([+\-*\/^])\s*(-?\d+\.?\d*)/,
+        /(?:what is |calculate |solve |compute |evaluate |math )?(-?\d+\.?\d*)\s*(plus|minus|times|divided by|multiplied by|power)\s*(-?\d+\.?\d*)/,
+    ];
     
-    let isMath = false;
-    for (const keyword of mathKeywords) {
-        if (text.includes(keyword)) {
-            isMath = true;
-            break;
-        }
-    }
-    
-    // If no math keywords and no numbers with operators, return null
-    if (!isMath && !/\d/.test(text)) return null;
-    if (!isMath && !/[+\-*/^()]/.test(text)) return null;
-    
-    // 1. COMPLEX EXPRESSIONS WITH PARENTHESES
-    try {
-        // Check for complex expressions with parentheses
-        const exprMatch = text.match(/^([\d+\-*/^().\s]+)$/);
-        if (exprMatch) {
-            const expr = exprMatch[1];
-            // Replace ^ with ** for JavaScript
-            const jsExpr = expr.replace(/\^/g, '**');
-            // Only allow safe characters
-            if (/^[\d+\-*/()**.\s]+$/.test(jsExpr)) {
-                const result = new Function(`return (${jsExpr})`)();
-                if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
-                    const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-                    return `${expr} = ${formatted}`;
-                }
+    for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) {
+            let num1 = parseFloat(match[1]);
+            let operator = match[2];
+            let num2 = parseFloat(match[3]);
+            
+            const wordOps = {
+                'plus': '+', 'minus': '-', 'times': '*',
+                'multiplied by': '*', 'divided by': '/', 'power': '^'
+            };
+            
+            if (wordOps[operator]) operator = wordOps[operator];
+            
+            let result;
+            switch (operator) {
+                case '+': result = num1 + num2; break;
+                case '-': result = num1 - num2; break;
+                case '*': result = num1 * num2; break;
+                case '/':
+                    if (num2 === 0) return "Division by zero is undefined.";
+                    result = num1 / num2;
+                    break;
+                case '^': result = Math.pow(num1, num2); break;
+                default: return null;
             }
+            
+            const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+            const symbol = { '+': '+', '-': '-', '*': 'x', '/': '/', '^': '^' }[operator];
+            return `${num1} ${symbol} ${num2} = ${formatted}`;
         }
-    } catch (e) {
-        // Ignore
     }
     
-    // 2. BASIC ARITHMETIC with operators
-    const arithmeticMatch = text.match(/([-+]?\d+\.?\d*)\s*([+\-*/^])\s*([-+]?\d+\.?\d*)/);
-    if (arithmeticMatch && !text.includes('sqrt') && !text.includes('root') && !text.includes('percent')) {
-        let num1 = parseFloat(arithmeticMatch[1]);
-        let operator = arithmeticMatch[2];
-        let num2 = parseFloat(arithmeticMatch[3]);
-        
-        let result;
-        switch (operator) {
-            case '+': result = num1 + num2; break;
-            case '-': result = num1 - num2; break;
-            case '*': result = num1 * num2; break;
-            case '/': 
-                if (num2 === 0) return "Division by zero is undefined.";
-                result = num1 / num2; 
-                break;
-            case '^': result = Math.pow(num1, num2); break;
-            default: return null;
-        }
-        
+    // Square root
+    const sqrtMatch = text.match(/(?:square root of |sqrt of |sqrt )(-?\d+\.?\d*)/);
+    if (sqrtMatch) {
+        const num = parseFloat(sqrtMatch[1]);
+        if (num < 0) return "Square root of a negative number is not a real number.";
+        const result = Math.sqrt(num);
         const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-        const symbol = { '+': '+', '-': '-', '*': '×', '/': '÷', '^': '^' }[operator];
-        return `${num1} ${symbol} ${num2} = ${formatted}`;
+        return `sqrt(${num}) = ${formatted}`;
     }
     
-    // 3. WORD OPERATORS (plus, minus, times, divided by)
-    const wordOpMatch = text.match(/([-+]?\d+\.?\d*)\s*(plus|minus|times|multiplied by|divided by|over)\s*([-+]?\d+\.?\d*)/);
-    if (wordOpMatch) {
-        let num1 = parseFloat(wordOpMatch[1]);
-        let operator = wordOpMatch[2];
-        let num2 = parseFloat(wordOpMatch[3]);
-        
-        let result;
-        let symbol;
-        switch (operator) {
-            case 'plus': 
-                result = num1 + num2; 
-                symbol = '+';
-                break;
-            case 'minus': 
-                result = num1 - num2; 
-                symbol = '-';
-                break;
-            case 'times':
-            case 'multiplied by': 
-                result = num1 * num2; 
-                symbol = '×';
-                break;
-            case 'divided by':
-            case 'over': 
-                if (num2 === 0) return "Division by zero is undefined.";
-                result = num1 / num2; 
-                symbol = '÷';
-                break;
-            default: return null;
-        }
-        
-        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-        return `${num1} ${symbol} ${num2} = ${formatted}`;
-    }
-    
-    // 4. PERCENTAGE
-    const pctMatch = text.match(/([-+]?\d+\.?\d*)\s*(?:%|percent)\s*(?:of)?\s*([-+]?\d+\.?\d*)/);
+    // Percentage
+    const pctMatch = text.match(/(?:what is |calculate )?(-?\d+\.?\d*)\s*(?:%|percent)\s*of\s*(-?\d+\.?\d*)/);
     if (pctMatch) {
         const pct = parseFloat(pctMatch[1]);
         const num = parseFloat(pctMatch[2]);
@@ -134,275 +81,14 @@ function solveMath(input) {
         return `${pct}% of ${num} = ${formatted}`;
     }
     
-    // 5. SQUARE ROOT
-    const sqrtMatch = text.match(/(?:sqrt|square root|root)\s*(?:of)?\s*([-+]?\d+\.?\d*)/);
-    if (sqrtMatch) {
-        const num = parseFloat(sqrtMatch[1]);
-        if (num < 0) return "Square root of a negative number is not a real number.";
-        const result = Math.sqrt(num);
-        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-        return `√${num} = ${formatted}`;
-    }
-    
-    // 6. POWER
-    const powMatch = text.match(/([-+]?\d+\.?\d*)\s*(?:to the power of|raised to|power)\s*([-+]?\d+\.?\d*)/);
+    // Power
+    const powMatch = text.match(/(-?\d+\.?\d*)\s*(?:\^|to the power of|power)\s*(-?\d+\.?\d*)/);
     if (powMatch) {
         const base = parseFloat(powMatch[1]);
         const exp = parseFloat(powMatch[2]);
         const result = Math.pow(base, exp);
         const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
         return `${base}^${exp} = ${formatted}`;
-    }
-    
-    // 7. FACTORIAL
-    const factMatch = text.match(/(\d+)\s*!/);
-    if (factMatch) {
-        const n = parseInt(factMatch[1]);
-        if (n > 170) return "Number too large for factorial.";
-        if (n < 0) return "Factorial not defined for negative numbers.";
-        let result = 1;
-        for (let i = 2; i <= n; i++) result *= i;
-        return `${n}! = ${result}`;
-    }
-    
-    // 8. ABSOLUTE VALUE
-    const absMatch = text.match(/abs\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (absMatch) {
-        const num = parseFloat(absMatch[1]);
-        return `|${num}| = ${Math.abs(num)}`;
-    }
-    
-    // 9. MODULO
-    const modMatch = text.match(/([-+]?\d+)\s*(?:mod|modulo)\s*([-+]?\d+)/);
-    if (modMatch) {
-        const a = parseInt(modMatch[1]);
-        const b = parseInt(modMatch[2]);
-        if (b === 0) return "Modulo by zero is undefined.";
-        return `${a} mod ${b} = ${a % b}`;
-    }
-    
-    // 10. ROUND
-    const roundMatch = text.match(/round\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (roundMatch) {
-        const num = parseFloat(roundMatch[1]);
-        return `round(${num}) = ${Math.round(num)}`;
-    }
-    
-    // 11. CEIL
-    const ceilMatch = text.match(/ceil\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (ceilMatch) {
-        const num = parseFloat(ceilMatch[1]);
-        return `ceil(${num}) = ${Math.ceil(num)}`;
-    }
-    
-    // 12. FLOOR
-    const floorMatch = text.match(/floor\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (floorMatch) {
-        const num = parseFloat(floorMatch[1]);
-        return `floor(${num}) = ${Math.floor(num)}`;
-    }
-    
-    // 13. LOGARITHM
-    const logMatch = text.match(/log\s*(?:base)?\s*([-+]?\d+\.?\d*)?\s*(?:of)?\s*([-+]?\d+\.?\d*)/);
-    if (logMatch && text.includes('log') && !text.includes('ln')) {
-        let base = logMatch[1] ? parseFloat(logMatch[1]) : 10;
-        let num = parseFloat(logMatch[2] || logMatch[1]);
-        
-        if (!logMatch[2]) {
-            num = parseFloat(logMatch[1]);
-            base = 10;
-        }
-        
-        if (num <= 0) return "Logarithm undefined for zero or negative numbers.";
-        if (base <= 0 || base === 1) return "Invalid logarithm base.";
-        const result = Math.log(num) / Math.log(base);
-        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-        return `log${base === 10 ? '' : '_' + base}(${num}) = ${formatted}`;
-    }
-    
-    // 14. NATURAL LOG
-    const lnMatch = text.match(/ln\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (lnMatch) {
-        const num = parseFloat(lnMatch[1]);
-        if (num <= 0) return "Natural log undefined for zero or negative numbers.";
-        const result = Math.log(num);
-        const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-        return `ln(${num}) = ${formatted}`;
-    }
-    
-    // 15. SINE
-    const sinMatch = text.match(/sin\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (sinMatch) {
-        const num = parseFloat(sinMatch[1]);
-        const result = Math.sin(num * Math.PI / 180);
-        return `sin(${num}°) = ${parseFloat(result.toFixed(6))}`;
-    }
-    
-    // 16. COSINE
-    const cosMatch = text.match(/cos\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (cosMatch) {
-        const num = parseFloat(cosMatch[1]);
-        const result = Math.cos(num * Math.PI / 180);
-        return `cos(${num}°) = ${parseFloat(result.toFixed(6))}`;
-    }
-    
-    // 17. TANGENT
-    const tanMatch = text.match(/tan\s*(?:of)?\s*\(\s*([-+]?\d+\.?\d*)\s*\)/);
-    if (tanMatch) {
-        const num = parseFloat(tanMatch[1]);
-        if (num % 180 === 90 || num % 180 === -90) return `tan(${num}°) is undefined.`;
-        const result = Math.tan(num * Math.PI / 180);
-        return `tan(${num}°) = ${parseFloat(result.toFixed(6))}`;
-    }
-    
-    // 18. PI
-    if (text.includes('pi') || text.includes('π')) {
-        const piMatch = text.match(/([-+]?\d+\.?\d*)?\s*(?:pi|π)/);
-        if (piMatch) {
-            const multiplier = piMatch[1] ? parseFloat(piMatch[1]) : 1;
-            const result = multiplier * Math.PI;
-            const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-            return `${multiplier === 1 ? '' : multiplier}π = ${formatted}`;
-        }
-    }
-    
-    // 19. QUADRATIC EQUATION: ax² + bx + c = 0
-    const quadMatch = text.match(/([-+]?\d+\.?\d*)\s*x\^2\s*([+-])\s*([-+]?\d+\.?\d*)\s*x\s*([+-])\s*([-+]?\d+\.?\d*)\s*=\s*0/);
-    if (quadMatch) {
-        const a = parseFloat(quadMatch[1]);
-        const bSign = quadMatch[2] === '+' ? 1 : -1;
-        const b = bSign * parseFloat(quadMatch[3]);
-        const cSign = quadMatch[4] === '+' ? 1 : -1;
-        const c = cSign * parseFloat(quadMatch[5]);
-        
-        const discriminant = b*b - 4*a*c;
-        if (discriminant < 0) {
-            return "No real solutions (discriminant < 0)";
-        } else if (discriminant === 0) {
-            const x = -b / (2*a);
-            return `x = ${x}`;
-        } else {
-            const x1 = (-b + Math.sqrt(discriminant)) / (2*a);
-            const x2 = (-b - Math.sqrt(discriminant)) / (2*a);
-            return `x₁ = ${x1}, x₂ = ${x2}`;
-        }
-    }
-    
-    // 20. DERIVATIVE (simple power rule)
-    const derivMatch = text.match(/d\/dx\s*\(\s*([-+]?\d+\.?\d*)\s*x\^?\s*([-+]?\d+\.?\d*)?\s*\)/);
-    if (derivMatch) {
-        const coeff = parseFloat(derivMatch[1]);
-        const exp = derivMatch[2] ? parseFloat(derivMatch[2]) : 1;
-        const newCoeff = coeff * exp;
-        const newExp = exp - 1;
-        if (newExp === 0) {
-            return `d/dx(${coeff}x${exp === 1 ? '' : '^' + exp}) = ${newCoeff}`;
-        } else {
-            return `d/dx(${coeff}x${exp === 1 ? '' : '^' + exp}) = ${newCoeff}x${newExp === 1 ? '' : '^' + newExp}`;
-        }
-    }
-    
-    // 21. INTEGRAL (simple power rule)
-    const intMatch = text.match(/∫\s*([-+]?\d+\.?\d*)\s*x\^?\s*([-+]?\d+\.?\d*)?\s*dx/);
-    if (intMatch) {
-        const coeff = parseFloat(intMatch[1]);
-        const exp = intMatch[2] ? parseFloat(intMatch[2]) : 1;
-        const newCoeff = coeff / (exp + 1);
-        const newExp = exp + 1;
-        if (newCoeff === 1 && newExp === 1) {
-            return `∫ ${coeff}x${exp === 1 ? '' : '^' + exp} dx = x + C`;
-        } else {
-            return `∫ ${coeff}x${exp === 1 ? '' : '^' + exp} dx = ${newCoeff}x${newExp === 1 ? '' : '^' + newExp} + C`;
-        }
-    }
-    
-    // 22. SYSTEM OF EQUATIONS (2 variables)
-    const sysMatch = text.match(/([-+]?\d+)\s*x\s*([+-])\s*([-+]?\d+)\s*y\s*=\s*([-+]?\d+)\s*and\s*([-+]?\d+)\s*x\s*([+-])\s*([-+]?\d+)\s*y\s*=\s*([-+]?\d+)/);
-    if (sysMatch) {
-        const a1 = parseFloat(sysMatch[1]);
-        const b1Sign = sysMatch[2] === '+' ? 1 : -1;
-        const b1 = b1Sign * parseFloat(sysMatch[3]);
-        const c1 = parseFloat(sysMatch[4]);
-        const a2 = parseFloat(sysMatch[5]);
-        const b2Sign = sysMatch[6] === '+' ? 1 : -1;
-        const b2 = b2Sign * parseFloat(sysMatch[7]);
-        const c2 = parseFloat(sysMatch[8]);
-        
-        const det = a1*b2 - a2*b1;
-        if (det === 0) {
-            return "No unique solution (determinant = 0)";
-        }
-        const x = (c1*b2 - c2*b1) / det;
-        const y = (a1*c2 - a2*c1) / det;
-        return `x = ${x}, y = ${y}`;
-    }
-    
-    // 23. SEQUENCE/SUM (arithmetic progression)
-    const sumMatch = text.match(/sum\s*from\s*(\d+)\s*to\s*(\d+)\s*of\s*([+-]?\d+)\s*n\s*([+-])\s*([+-]?\d+)/);
-    if (sumMatch) {
-        const start = parseInt(sumMatch[1]);
-        const end = parseInt(sumMatch[2]);
-        const a = parseFloat(sumMatch[3]);
-        const sign = sumMatch[4] === '+' ? 1 : -1;
-        const b = sign * parseFloat(sumMatch[5]);
-        let sum = 0;
-        for (let n = start; n <= end; n++) {
-            sum += a*n + b;
-        }
-        return `Σ(${a}n${b < 0 ? '' : '+'}${b}) from ${start} to ${end} = ${sum}`;
-    }
-    
-    // 24. MATRIX DETERMINANT (2x2)
-    const matrixMatch = text.match(/det\s*\[\s*([-+]?\d+\.?\d*)\s+([-+]?\d+\.?\d*)\s*;\s*([-+]?\d+\.?\d*)\s+([-+]?\d+\.?\d*)\s*\]/);
-    if (matrixMatch) {
-        const a = parseFloat(matrixMatch[1]);
-        const b = parseFloat(matrixMatch[2]);
-        const c = parseFloat(matrixMatch[3]);
-        const d = parseFloat(matrixMatch[4]);
-        const det = a*d - b*c;
-        return `det([${a} ${b}; ${c} ${d}]) = ${det}`;
-    }
-    
-    // 25. COMBINATION/PERMUTATION
-    const combMatch = text.match(/(\d+)\s*C\s*(\d+)/);
-    if (combMatch) {
-        const n = parseInt(combMatch[1]);
-        const r = parseInt(combMatch[2]);
-        if (r > n) return "Invalid combination (r > n)";
-        let result = 1;
-        for (let i = 0; i < r; i++) {
-            result *= (n - i);
-        }
-        for (let i = 1; i <= r; i++) {
-            result /= i;
-        }
-        return `${n}C${r} = ${result}`;
-    }
-    
-    const permMatch = text.match(/(\d+)\s*P\s*(\d+)/);
-    if (permMatch) {
-        const n = parseInt(permMatch[1]);
-        const r = parseInt(permMatch[2]);
-        if (r > n) return "Invalid permutation (r > n)";
-        let result = 1;
-        for (let i = 0; i < r; i++) {
-            result *= (n - i);
-        }
-        return `${n}P${r} = ${result}`;
-    }
-    
-    // 26. SIMPLE EXPRESSIONS WITH MULTIPLE OPERATIONS
-    try {
-        const cleanExpr = text.replace(/[^0-9+\-*/().]/g, '');
-        if (cleanExpr.length > 1 && /[+\-*/]/.test(cleanExpr)) {
-            const result = new Function(`return (${cleanExpr})`)();
-            if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
-                const formatted = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
-                return `${cleanExpr} = ${formatted}`;
-            }
-        }
-    } catch (e) {
-        // Ignore
     }
     
     return null;
@@ -661,7 +347,7 @@ function findMatch(input) {
 // ============ RESPONSE ============
 
 async function getResponse(input) {
-    // 0. MATH - Check first and highest priority
+    // 0. MATH - Calculate first
     const mathResult = solveMath(input);
     if (mathResult) return mathResult;
     
@@ -702,30 +388,9 @@ function addMessage(text, sender) {
     const container = document.getElementById('chatContainer');
     const div = document.createElement('div');
     div.className = `message ${sender}`;
-    
-    const avatarDiv = document.createElement('div');
-    avatarDiv.className = `avatar ${sender === 'user' ? 'user-avatar' : 'bot-avatar'}`;
-    
-    if (sender === 'user') {
-        avatarDiv.textContent = 'U';
-    } else {
-        // Bot avatar with image
-        const img = document.createElement('img');
-        img.src = 'damba.webp';
-        img.alt = 'Dambar';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '50%';
-        avatarDiv.appendChild(img);
-    }
-    
-    const messageTextDiv = document.createElement('div');
-    messageTextDiv.className = 'message-text';
-    messageTextDiv.textContent = text;
-    
-    div.appendChild(avatarDiv);
-    div.appendChild(messageTextDiv);
+    const cls = sender === 'user' ? 'user-avatar' : 'bot-avatar';
+    const letter = sender === 'user' ? 'U' : 'D';
+    div.innerHTML = `<div class="avatar ${cls}">${letter}</div><div class="message-text">${text}</div>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
 }
@@ -735,24 +400,7 @@ function showTyping() {
     const div = document.createElement('div');
     div.className = 'typing-indicator';
     div.id = 'typingIndicator';
-    
-    const avatarDiv = document.createElement('div');
-    avatarDiv.className = 'avatar bot-avatar';
-    const img = document.createElement('img');
-    img.src = 'damba.webp';
-    img.alt = 'Dambar';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    img.style.borderRadius = '50%';
-    avatarDiv.appendChild(img);
-    
-    const dotsDiv = document.createElement('div');
-    dotsDiv.className = 'typing-dots';
-    dotsDiv.innerHTML = '<span></span><span></span><span></span>';
-    
-    div.appendChild(avatarDiv);
-    div.appendChild(dotsDiv);
+    div.innerHTML = `<div class="avatar bot-avatar">D</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
 }
@@ -783,9 +431,9 @@ async function sendMessage() {
 
 window.addEventListener('load', async () => {
     buildWordModel();
-    addMessage('👋 Ni Hao gng!', 'bot');
+    addMessage('Training neural network...', 'bot');
     await trainNN(30);
-    addMessage('Hello! I am Dambar. Ask me anything, give me math problems, or just chat!', 'bot');
+    addMessage('Hello.', 'bot');
     document.getElementById('userInput').focus();
 });
 

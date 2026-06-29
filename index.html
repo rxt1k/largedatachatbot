@@ -17,10 +17,7 @@
             </div>
         </div>
         
-        <!-- Chat Container -->
         <div class="chat" id="chatContainer"></div>
-        
-        <!-- Input Area -->
         <div class="input-area">
             <div class="input-wrapper">
                 <input 
@@ -35,8 +32,10 @@
         </div>
     </div>
 
-    <script src="maths.js"></script>
-    <script src="training-data.js"></script>
-    <script src="script.js"></script>
+    <!-- Load in this order -->
+
+    <script src="maths.js"></script>        <!-- First: Math engine -->
+    <script src="training-data.js"></script> <!-- Second: Knowledge base -->
+    <script src="script.js"></script>        <!-- Third: Main script -->
 </body>
 </html>
